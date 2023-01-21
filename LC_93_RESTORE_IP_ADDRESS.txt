@@ -1,0 +1,96 @@
+/*
+LC 93 RESTORE IP ADDRESS
+PROBLEM
+A valid IP address consists of exactly four integers separated by single dots. Each integer is between 0 and 255 (inclusive) and cannot have leading zeros.
+
+For example, "0.1.2.201" and "192.168.1.1" are valid IP addresses, but "0.011.255.245", "192.168.1.312" and "192.168@1.1" are invalid IP addresses.
+Given a string s containing only digits, return all possible valid IP addresses that can be formed by inserting dots into s. You are not allowed to reorder or remove any digits in s. You may return the valid IP addresses in any order.
+
+ 
+
+Example 1:
+
+Input: s = "25525511135"
+Output: ["255.255.11.135","255.255.111.35"]
+Example 2:
+
+Input: s = "0000"
+Output: ["0.0.0.0"]
+Example 3:
+
+Input: s = "101023"
+Output: ["1.0.10.23","1.0.102.3","10.1.0.23","10.10.2.3","101.0.2.3"]
+ 
+
+Constraints:
+
+1 <= s.length <= 20
+s consists of digits only.
+*/
+
+SOLUTION -------------------------------------
+
+class Solution {
+    bool check(string str)
+    {    
+        string temp;
+        long n;
+        if(str[0]=='0' && str[1]!='.')
+            return false;
+        for(int i=0;i<str.size();i++)
+        {
+            if(!temp.empty())
+                n=stol(temp);
+            
+            if(i<str.size()-1 && i>0 && str[i-1]=='.' && str[i]=='0' && str[i+1]!='.')
+                return false;
+            
+            if(!temp.empty() && str[i]=='.' && n>255)
+                return false;
+                
+            if(str[i]!='.')temp.push_back(str[i]);
+            else if(str[i]=='.')temp="";
+        }
+        n=stol(temp);
+        if(!temp.empty() && n > 255)
+            return false;
+        
+        return true;
+    }
+    
+    void f(int idx,string s,string str,vector<string> &ans,int &c)
+    {
+        if(idx == s.size()-1 || c==3)
+        {
+            for(int i=idx;i<s.size();i++)
+                str.push_back(s[i]);
+            
+            if(c==3)
+            {
+                //cout<<str<<"-"<<c<<"   ";
+                if(check(str))ans.push_back(str);
+            }
+            return;
+        }
+        
+        str.push_back(s[idx]);
+        str.push_back('.');
+        c++;
+        f(idx+1,s,str,ans,c);
+        c--;
+        str.pop_back();
+        f(idx+1,s,str,ans,c);
+    }
+public:
+    vector<string> restoreIpAddresses(string s) {
+        vector<string> ans;
+        if(s.length() < 4 && s.length() > 12)
+            return ans;
+        
+        string str;
+        int c=0;
+        f(0,s,str,ans,c);
+        //cout<<"\n";
+        return ans;
+    }
+};
